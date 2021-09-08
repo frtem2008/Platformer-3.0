@@ -3,10 +3,10 @@ import java.io.File;
 import java.io.IOException;
 
 public class Audio {
+    private final String track; // адрес трека(файла)
     public boolean pl_audio;// воспроизведение звука
     public long timer_p = 0;// начальное время для таймера звучания
     public long timer_d;// (количество миллисекунд) длительность трека
-    private final String track; // адрес трека(файла)
     private Clip clip = null;// ссылка на объект класса
     private FloatControl volumeC = null;// контролер громкости
     private double wt; //уровень громкости
@@ -22,7 +22,7 @@ public class Audio {
     //конструктор (адрес файла, уровень громкости, кол.милсек звук трек)
     public Audio(String track, double wt, long timer_d) {
         this.timer_d = timer_d;
-        this.track = "src/Sounds/" + track + ".wav";
+        this.track = "src/resources/Sounds/" + track + ".wav";
         this.pl_audio = false;
         this.wt = wt;//
     }

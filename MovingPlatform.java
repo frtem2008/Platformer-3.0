@@ -64,7 +64,6 @@ public class MovingPlatform {
         for (int i = 0; i < platforms.length; i++) {
             MovingPlatform cur = platforms[i];
             if (Platform.Collides(player, new Platform[]{cur.platform}) != -1) {
-                System.out.println("COLL");
                 return i;
             }
         }

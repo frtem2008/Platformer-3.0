@@ -28,8 +28,8 @@ public class Player {
     public static double speed;
     public static double begin, end;
     public static int firstTime = 0;
-    private static double gravitation;
-    private static boolean jump;
+    public static double gravitation;
+    public static boolean jump;
     private static double maxFallingHeight;
     private static int frame;
     private static boolean onBarrier;
@@ -53,7 +53,7 @@ public class Player {
         spawnpointsY = new ArrayList<>();
         chat = new String[6];
         chatLast = 0;
-        size = 60.0D;
+        size = 64.0D;
         gravitation = 0.0D;
         jump = true;
         speed = 80.0D;
@@ -80,7 +80,7 @@ public class Player {
     }
 
     public static void jumpSound() {
-      /*  Audio jump = new Audio("src/Sounds/jump.wav", 1.0);
+      /*  Audio jump = new Audio("src/resources.Sounds/jump.wav", 1.0);
         jump.play();
         jump.setVolume();*/
     }
@@ -114,7 +114,7 @@ public class Player {
 
     public void move() {
         keyboard.update();
-
+        Main.fonX = (int) x / 100;
         if (chatLast >= chat.length) {
             for (int i = 1; i < chat.length; ++i) {
                 chat[i] = chat[i - 1];
@@ -150,7 +150,7 @@ public class Player {
                 MovingPlatform cur = movingPlatforms[MovingPlatform.Collides(Main.player, movingPlatforms)];
                 Scanner s = null;
                 try {
-                    s = new Scanner(new File("src/levels/restore.txt"));
+                    s = new Scanner(new File("src/resources/levels/restore.txt"));
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 }
@@ -266,7 +266,14 @@ public class Player {
                         double ms = end - begin;
                         int sec = (int) (ms / 1000);
                         String minSec = String.format("%02d:%02d", sec / 60 % 60, sec % 60);
-                        Main.endMessage = "YOU'VE WON!!!\nTime: " + minSec;
+                        if (Main.LEARN.equals("false")) {
+                            Main.clearFile("src/resources/levels/restore.txt");
+                            Main.appendStrToFile("src/resources/levels/restore.txt", "false");
+                            System.out.println("now go to a new rgenerated level");
+                            Main.endMessage = "Restart the program \nto complete the real level";
+                        } else {
+                            Main.endMessage = "YOU'VE WON!!!\nTime: " + minSec;
+                        }
                         java.util.Timer t = new java.util.Timer();
                         t.schedule(new TimerTask() {
                             @Override
@@ -515,9 +522,6 @@ public class Player {
             this.setSpawnpoint(spawnpointsX.get(0), spawnpointsY.get(0));
         }
 
-        if (keyboard.getZ()) {
-            Main.playerSkin = 1;
-        }
         if (fromDown) {
             if (fromLeft) {
                 Main.playerSkin = 5;

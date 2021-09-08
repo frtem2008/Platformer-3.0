@@ -1,4 +1,3 @@
-
 public class Barrier {
     private final double x;
     private final double y1;
@@ -13,7 +12,7 @@ public class Barrier {
     public static int Collides(Player player, Barrier[] barriers) {
         int b = -1;
 
-        for(int i = 0; i < barriers.length; ++i) {
+        for (int i = 0; i < barriers.length; ++i) {
             Barrier barrier = barriers[i];
             double x0 = player.getX();
             double y0 = player.getY();

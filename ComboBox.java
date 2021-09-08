@@ -20,8 +20,9 @@ class ComboBoxFrame extends JFrame {
     public static final int DEFAULT_WIDTH = 300;
     public static final int DEFAULT_HEIGHT = 300;
     private static final int DEFAULT_SIZE = 12;
-    private JComboBox<String> faceCombo;
-    private JLabel label;
+    private final JComboBox<String> faceCombo;
+    private final JLabel label;
+
     public ComboBoxFrame() {
         setTitle("ComboBox");
         setSize(DEFAULT_WIDTH, DEFAULT_HEIGHT);

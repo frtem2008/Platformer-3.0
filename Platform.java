@@ -1,18 +1,14 @@
 public class Platform {
     private final int defaultX;
     private final int defaultY;
+    private final Rectangle r;
     private double platformX = 0.0D;
     private double platformY = 0.0D;
     private int width = 100;
     private int height = 50;
-    private final Rectangle r;
     private boolean isSpawnpoint = false;
 
-    public void setSpawnpoint(boolean spawnpoint) {
-        isSpawnpoint = spawnpoint;
-    }
-
-    public Platform(Platform platform){
+    public Platform(Platform platform) {
         this.platformX = platform.getPlatformX();
         this.platformY = platform.getPlatformY();
         this.defaultX = (int) platform.getPlatformX();
@@ -21,17 +17,6 @@ public class Platform {
         this.height = (int) platform.getHeight();
         this.isSpawnpoint = platform.isSpawnpoint();
         this.r = platform.getRect();
-    }
-
-    public void setPlatformX(double platformX) {
-        this.platformX = platformX;
-        this.r.x = platformX;
-
-    }
-
-    public void setPlatformY(double platformY) {
-        this.platformY = platformY;
-        this.r.y = platformY;
     }
 
     public Platform(int x, int y, int width, int height) {
@@ -79,6 +64,10 @@ public class Platform {
         return this.isSpawnpoint;
     }
 
+    public void setSpawnpoint(boolean spawnpoint) {
+        isSpawnpoint = spawnpoint;
+    }
+
     public Rectangle getRect() {
         return this.r;
     }
@@ -91,10 +80,20 @@ public class Platform {
         return this.r.x;
     }
 
+    public void setPlatformX(double platformX) {
+        this.platformX = platformX;
+        this.r.x = platformX;
+
+    }
+
     public double getPlatformY() {
         return this.r.y;
     }
 
+    public void setPlatformY(double platformY) {
+        this.platformY = platformY;
+        this.r.y = platformY;
+    }
 
     public double getWidth() {
         return this.r.w;

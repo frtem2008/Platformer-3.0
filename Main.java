@@ -1,14 +1,23 @@
+//Version 3.0
+
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferStrategy;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.file.Files;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.*;
 
 public class Main {
-    public static int fonX = 0, fonY = 0;
+
+    public static boolean JAR = true;
+
+
     public static final int a = 10000;
     public static final int b = -10000;
     public static final Platform learn1 = new Platform(-12800, 10600, 1200, 50);
@@ -16,6 +25,19 @@ public class Main {
     public static final Platform learn3 = new Platform(-10880, 10600, 1400, 50);
     public static final Platform learn4 = new Platform(-9160, 10600, 700, 50, true);
     public static final Platform learn5 = new Platform(-8200, 11000, 700, 50);
+    public static final String ANSI_RESET = "\u001B[0m";
+    public static final String ANSI_BLACK = "\u001B[30m";
+    public static final String ANSI_RED = "\u001B[31m";
+    public static final String ANSI_GREEN = "\u001B[32m";
+    public static final String ANSI_YELLOW = "\u001B[33m";
+    public static final String ANSI_BLUE = "\u001B[34m";
+    public static final String ANSI_PURPLE = "\u001B[35m";
+    public static final String ANSI_CYAN = "\u001B[36m";
+    public static final String ANSI_WHITE = "\u001B[37m";
+    public static String LEARN, NAME, RESTORE;
+    public static int fonOffset = 0;
+    public static int fonX = 0;
+    public static int openedWindows = 0;
     public static boolean restore = false;
     public static int frameCounter = 1;
     public static int backgrNum = 1;
@@ -36,20 +58,26 @@ public class Main {
     public static MovingPlatform[] movingPlatforms = new MovingPlatform[1];
     public static Player player = new Player();
     public static Bird[] birds = new Bird[20];
+    public static File console = new File("src/resources/console.txt");
 
     static {
-
-        Scanner rest = null;
         try {
-            rest = new Scanner(new File("src/levels/restore.txt"));
+            System.setOut(new PrintStream(console));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+        Scanner rest = null;
+        try {
+            rest = new Scanner(new File("src/resources/levels/restore.txt"));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        assert rest != null;
         String res = rest.nextLine();
         restore = res.equals("true");
         Scanner n = null;
         try {
-            n = new Scanner(new File("src/levels/name.txt"));
+            n = new Scanner(new File("src/resources/levels/name.txt"));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -95,11 +123,9 @@ public class Main {
     public ImageIcon birdLeft8;
     public ImageIcon birdLeft9;
     public ImageIcon birdLeft10;
+    public ImageIcon eye;
+    public ImageIcon emptyPlayer;
     public ImageIcon PLAYER2;
-    public ImageIcon PLAYER3;
-    public ImageIcon PLAYER4;
-    public ImageIcon PLAYER5;
-    public ImageIcon PLAYER6;
     public ImageIcon fon1;
     public ImageIcon fon2;
     public ImageIcon fon3;
@@ -140,10 +166,6 @@ public class Main {
 
     }
 
-    public static ImageIcon createIcon(String path) {
-        return new ImageIcon(Objects.requireNonNull(Main.class.getResource(path)));
-    }
-
     public static Platform[] addAll(Platform... a) {
         ArrayList<Platform> pl = new ArrayList<>(Arrays.asList(platforms));
         for (int i = 0; i < a.length; i++) {
@@ -182,14 +204,14 @@ public class Main {
 
     public static void saveLevel(String name) {
 
-        appendStrToFile("src/levels/levels.txt", name + "\n");
-        File level = new File("src/levels/" + name);
+        appendStrToFile("src/resources/levels/levels.txt", name + "\n");
+        File level = new File("src/resources/levels/learn" + name);
         level.mkdir();
-        File Platforms = new File("src/levels/" + name + "/platforms.txt");
-        File MovingPlatforms = new File("src/levels/" + name + "/movingPlatforms.txt");
-        File Barriers = new File("src/levels/" + name + "/barriers.txt");
-        File Arrows = new File("src/levels/" + name + "/arrows.txt");
-        File playerData = new File("src/levels/" + name + "/player data.txt");
+        File Platforms = new File("src/resources/levels/learn" + name + "/platforms.txt");
+        File MovingPlatforms = new File("src/resources/levels/learn" + name + "/movingPlatforms.txt");
+        File Barriers = new File("src/resources/levels/learn" + name + "/barriers.txt");
+        File Arrows = new File("src/resources/levels/learn" + name + "/arrows.txt");
+        File playerData = new File("src/resources/levels/learn" + name + "/player data.txt");
 
         try {
             Platforms.createNewFile();
@@ -200,37 +222,37 @@ public class Main {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        clearFile("src/levels/" + name + "/platforms.txt");
-        clearFile("src/levels/" + name + "/barriers.txt");
-        clearFile("src/levels/" + name + "/arrows.txt");
-        clearFile("src/levels/" + name + "/movingPlatforms.txt");
-        clearFile("src/levels/" + name + "/player data.txt");
+        clearFile("src/resources/levels/learn" + name + "/platforms.txt");
+        clearFile("src/resources/levels/learn" + name + "/barriers.txt");
+        clearFile("src/resources/levels/learn" + name + "/arrows.txt");
+        clearFile("src/resources/levels/learn" + name + "/movingPlatforms.txt");
+        clearFile("src/resources/levels/learn" + name + "/player data.txt");
         for (int i = 0; i < platforms.length; i++) {
             Platform cur = platforms[i];
-            appendStrToFile("src/levels/" + name + "/platforms.txt", cur.getPlatformX() + "~" + cur.getPlatformY() + "~" + cur.getWidth() + "~" + cur.getHeight() + "~" + cur.isSpawnpoint() + "\n");
+            appendStrToFile("src/resources/levels/learn" + name + "/platforms.txt", cur.getPlatformX() + "~" + cur.getPlatformY() + "~" + cur.getWidth() + "~" + cur.getHeight() + "~" + cur.isSpawnpoint() + "\n");
         }
         for (int i = 0; i < movingPlatforms.length; i++) {
             MovingPlatform cur = movingPlatforms[i];
-            appendStrToFile("src/levels/" + name + "/movingPlatforms.txt", cur.platform.getPlatformX() + "~" + cur.platform.getPlatformY() + "~" + cur.platform.getWidth() + "~" + cur.platform.getHeight() + "~" + cur.platform.isSpawnpoint() + "~" + cur.x1 + "~" + cur.x2 + "~" + cur.defaultXSpeed / 2 + "~" + cur.XDirection + "~" + cur.y1 + "~" + cur.y2 + "~" + cur.defaultYSpeed / 2 + "~" + cur.YDirection + "\n");
+            appendStrToFile("src/resources/levels/learn" + name + "/movingPlatforms.txt", cur.platform.getPlatformX() + "~" + cur.platform.getPlatformY() + "~" + cur.platform.getWidth() + "~" + cur.platform.getHeight() + "~" + cur.platform.isSpawnpoint() + "~" + cur.x1 + "~" + cur.x2 + "~" + cur.defaultXSpeed / 2 + "~" + cur.XDirection + "~" + cur.y1 + "~" + cur.y2 + "~" + cur.defaultYSpeed / 2 + "~" + cur.YDirection + "\n");
         }
         for (int i = 0; i < arrows.length; i++) {
             Arrow cur = arrows[i];
-            appendStrToFile("src/levels/" + name + "/arrows.txt", cur.getArrowX() + "~" + cur.getArrowX() + "~" + cur.getLength() + "~" + cur.getHeight() + "\n");
+            appendStrToFile("src/resources/levels/learn" + name + "/arrows.txt", cur.getArrowX() + "~" + cur.getArrowX() + "~" + cur.getLength() + "~" + cur.getHeight() + "\n");
         }
         for (int i = 0; i < barriers.length; i++) {
             Barrier cur = barriers[i];
-            appendStrToFile("src/levels/" + name + "/barriers.txt", cur.getX() + "~" + cur.getY1() + "~" + cur.getY2() + "\n");
+            appendStrToFile("src/resources/levels/learn" + name + "/barriers.txt", cur.getX() + "~" + cur.getY1() + "~" + cur.getY2() + "\n");
         }
-        appendStrToFile("src/levels/" + name + "/player data.txt", Player.x + "~" + Player.y);
+        appendStrToFile("src/resources/levels/learn" + name + "/player data.txt", Player.x + "~" + Player.y);
     }
 
     public static Object[] restoreLevel(String name) {
         Scanner platformReader = null, barrierReader = null, arrowReader = null, playerDataReader = null, movingReader = null;
-        File Platforms = new File("src/levels/" + name + "/platforms.txt");
-        File Barriers = new File("src/levels/" + name + "/barriers.txt");
-        File Arrows = new File("src/levels/" + name + "/arrows.txt");
-        File MovingPlatforms = new File("src/levels/" + name + "/movingPlatforms.txt");
-        File playerData = new File("src/levels/" + name + "/player data.txt");
+        File Platforms = new File("src/resources/levels/" + name + "/platforms.txt");
+        File Barriers = new File("src/resources/levels/" + name + "/barriers.txt");
+        File Arrows = new File("src/resources/levels/" + name + "/arrows.txt");
+        File MovingPlatforms = new File("src/resources/levels/" + name + "/movingPlatforms.txt");
+        File playerData = new File("src/resources/levels/" + name + "/player data.txt");
         try {
             platformReader = new Scanner(Platforms);
             barrierReader = new Scanner(Barriers);
@@ -333,10 +355,10 @@ public class Main {
                 movingPlatforms = addAll((MovingPlatform) level[i]);
             }
         }
-        clearFile("src/levels/restore.txt");
-        appendStrToFile("src/levels/restore.txt", "true");
-        clearFile("src/levels/name.txt");
-        appendStrToFile("src/levels/name.txt", name);
+        clearFile("src/resources/levels/restore.txt");
+        appendStrToFile("src/resources/levels/restore.txt", "true");
+        clearFile("src/resources/levels/name.txt");
+        appendStrToFile("src/resources/levels/name.txt", name);
         System.out.println("level " + name + " restored");
         return level;
     }
@@ -380,12 +402,20 @@ public class Main {
     }
 
     public void startDrawing(JFrame frame) throws InterruptedException {
-        File levelList = new File("src/levels");
+        Scanner b = new Scanner("src/resources/levels/name.txt");
+        RESTORE = restore + "";
+        NAME = b.nextLine();
+        if (NAME.equals("learn") && RESTORE.equals("true")) {
+            LEARN = "true";
+        } else {
+            LEARN = "false";
+        }
+        File levelList = new File("src/resources/levels");
         String[] Levels = levelList.list();
-        clearFile("src/levels/levels.txt");
+        clearFile("src/resources/levels/levels.txt");
         for (int i = 0; i < (Levels != null ? Levels.length : 0); i++) {
             if (!Levels[i].contains(".txt"))
-                appendStrToFile("src/levels/levels.txt", Levels[i] + "\n");
+                appendStrToFile("src/resources/levels/levels.txt", Levels[i] + "\n");
         }
         AudioThread music = new AudioThread();
         Thread musicPLayer = new Thread(music);
@@ -421,6 +451,34 @@ public class Main {
 
             Keyboard keyboard = Player.keyboard;
             frame.addKeyListener(keyboard);
+            if (keyboard.getB() && keyboard.getCtrl()) {
+                if (Textures3d) {
+                    Textures3d = false;
+                } else {
+                    Textures3d = true;
+                }
+                updateImages();
+            }
+            if (keyboard.getS() && keyboard.getCtrl()) {
+                LocalDate date = LocalDate.now();
+                LocalTime time = LocalTime.now();
+                String real = time.toString().substring(0, time.toString().indexOf(".") - 1);
+                real = real.replaceAll(":", "_");
+                File screenShot = new File("src/resources/screenshots/" + date + " " + real + ".png");
+                Robot robot = null;
+                try {
+                    robot = new Robot();
+                } catch (AWTException e) {
+                    e.printStackTrace();
+                }
+                assert robot != null;
+                BufferedImage bi = robot.createScreenCapture(new java.awt.Rectangle(1600, 900));
+                try {
+                    ImageIO.write(bi, "png", new File("src/screenshots/" + date + real + ".png"));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
             if (keyboard.getM() && keyboard.getShift() && keyboard.getCtrl()) {
                 String name = JOptionPane.showInputDialog(frame, "Введите название уровня для сохранения");
                 saveLevel(name);
@@ -429,29 +487,31 @@ public class Main {
                 System.out.println("level saved as " + name);
 
             }
+
             if (keyboard.getN() && keyboard.getShift() && keyboard.getCtrl()) {
                 /*String name = JOptionPane.showInputDialog(frame, "Введите название уровня для восстановления");
                 level = restoreLevel(name);
                 System.out.println("restore mode on");
                 System.exit(10);*/
-                EventQueue.invokeLater(() -> {
-                    ComboBoxFrame jframe = new ComboBoxFrame();
-                    jframe.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-                    jframe.setVisible(true);
-                });
+                if (openedWindows == 0) {
+                    openedWindows++;
+                    EventQueue.invokeLater(() -> {
+                        ComboBoxFrame jframe = new ComboBoxFrame();
+                        jframe.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+                        jframe.setVisible(true);
+                    });
+                }
 
             }
             if (keyboard.getU() && keyboard.getShift() && keyboard.getCtrl()) {
-                clearFile("src/levels/restore.txt");
-                appendStrToFile("src/levels/restore.txt", "false");
-                System.out.println("restore mode off");
+                clearFile("src/resources/levels/restore.txt");
+                appendStrToFile("src/resources/levels/restore.txt", "false");
             }
             if (keyboard.getG() && keyboard.getShift() && keyboard.getCtrl()) {
                 String objCount = JOptionPane.showInputDialog(frame, "Сколько объектов будет в уровне");
                 level = Generator.generateLevel(Integer.parseInt(objCount));
-                clearFile("src/levels/restore.txt");
-                appendStrToFile("src/levels/restore.txt", "false");
-                System.out.println("restore mode off");
+                clearFile("src/resources/levels/restore.txt");
+                appendStrToFile("src/resources/levels/restore.txt", "false");
                 System.exit(10);
 
             }
@@ -459,7 +519,6 @@ public class Main {
     }
 
     public void draw(Graphics g) {
-
         JProgressBar jpb = new JProgressBar();
         jpb.setMinimum(0);
         jpb.setMaximum(100);
@@ -469,22 +528,46 @@ public class Main {
         Platform last = Main.platforms[Main.platforms.length - 1];
         int length = (int) (last.getPlatformX() + last.getWidth() - f.getWidth() - f.getPlatformX());
         jpb.setValue((int) (player.getX() / length * 100));
-
-        if (jpb.getValue() >= 0 && jpb.getValue() < 25) {
-            backgrNum = 1;
-        } else if (jpb.getValue() > 25 && jpb.getValue() < 50) {
-            backgrNum = 2;
-        } else if (jpb.getValue() > 50 && jpb.getValue() < 75) {
-            backgrNum = 3;
-        } else if (jpb.getValue() > 75 && jpb.getValue() < 100) {
-            backgrNum = 4;
+        Scanner sa = null;
+        try {
+            sa = new Scanner(new File("src/resources/levels/name.txt"));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        if (!(sa.nextLine().equals("learn") && restore)){
+            if (jpb.getValue() >= 0 && jpb.getValue() < 25) {
+                backgrNum = 1;
+            } else if (jpb.getValue() > 25 && jpb.getValue() < 50) {
+                backgrNum = 2;
+            } else if (jpb.getValue() > 50 && jpb.getValue() < 75) {
+                backgrNum = 3;
+            } else if (jpb.getValue() > 75 && jpb.getValue() < 100) {
+                backgrNum = 4;
+            }
+        } else {
+            backgrNum = 5;
         }
         if (jpb.getValue() % 25 == 0) {
             g.setColor(Color.black);
             g.fillRect(0, 0, frame.getWidth(), frame.getHeight());
         }
+        try {
+            Scanner s = new Scanner(new File("src/resources/levels/name.txt"));
+            if (s.nextLine().equals("learn") && restore) {
+                g.drawImage(this.fon, 0, 0, Display.frame.getWidth(), Display.frame.getHeight(), null);
+            } else {
+                fonOffset = -3200;
+                double fonSpeedDiv = 10d;
+                g.drawImage(this.fon, (int) toScreenX(fonX), 0, Display.frame.getWidth(), Display.frame.getHeight(), null);
+                for (int i = 0; i < 100 / fonSpeedDiv; i++) {
+                    g.drawImage(this.fon, (int) ((int) toScreenX(fonX + fonOffset) / fonSpeedDiv), 0, Display.frame.getWidth(), Display.frame.getHeight(), null);
+                    fonOffset += 1600 * fonSpeedDiv;
+                }
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
 
-        g.drawImage(this.fon, 0, 0, Display.frame.getWidth(), Display.frame.getHeight(), null);
         frame.add(jpb);
         jpb.update(g);
         jpb.setVisible(true);
@@ -516,6 +599,35 @@ public class Main {
         g.setColor(Color.BLACK);
         //g.fillOval((int) toScreenX(player.getX()), (int) toScreenY(player.getY()), (int) player.getSize(), (int) player.getSize());
         g.drawImage(PLAYER, (int) toScreenX(player.getX()), (int) toScreenY(player.getY()), (int) player.getSize(), (int) player.getSize(), null);
+        int x1 = (int) toScreenX(player.getX());
+        int y1 = (int) toScreenY(player.getY());
+        int x2 = x1;
+        int y2 = y1;
+        int size = (int) player.getSize() / 8;
+        if (playerSkin == 3) {
+            x1 += 16;
+            x2 += 44;
+            y1 += 12;
+            y2 += 12;
+        } else if (playerSkin == 4) {
+            x1 += 16;
+            x2 += 44;
+            y1 += 16;
+            y2 += 16;
+        } else if (playerSkin == 5) {
+            x1 += 12;
+            x2 += 40;
+            y1 += 12;
+            y2 += 12;
+        } else if (playerSkin == 6) {
+            x1 += 12;
+            x2 += 40;
+            y1 += 16;
+            y2 += 16;
+        }
+
+        g.drawImage(eye.getImage(), x1, y1, size, size, null);
+        g.drawImage(eye.getImage(), x2, y2, size, size, null);
         g.setColor(Color.red);
         g.setFont(new Font("bruh", Font.BOLD, 24));
         g.drawString(Player.ohh, (int) toScreenX(player.getX()), (int) toScreenY(player.getY() + player.getSize() + 10.0D));
@@ -542,7 +654,7 @@ public class Main {
             g.drawString(chat[i], 15, 350 + i * 50);
         }
 
-        g.setColor(new Color(187, 136, 13, 255));
+        g.setColor(new Color(0, 128, 255, 255));
         g.drawString("To go left/right use a/d or left arrow/ right arrow", (int) toScreenX(-12850.0D), (int) toScreenY(10400.0D));
         g.drawString("To jump use w/space/up arrow", (int) toScreenX(-12250.0D), (int) toScreenY(10400.0D));
         g.drawString("Jump here", (int) toScreenX(-11695.0D), (int) toScreenY(10540.0D));
@@ -555,11 +667,15 @@ public class Main {
         g.drawString("Press left", (int) toScreenX(-9925.0D), (int) toScreenY(10428.0D));
         g.drawString("Go --->", (int) toScreenX(-9900.0D), (int) toScreenY(10560.0D));
         g.drawString("Jump", (int) toScreenX(-9504.0D), (int) toScreenY(10560.0D));
-        g.drawString("You're on the edge of the platform", (int) toScreenX(-9440.0D), (int) toScreenY(10400.0D));
-        g.drawString("You can push off it as a barrier ", (int) toScreenX(-9440.0D), (int) toScreenY(10450.0D));
-        g.drawString("Now you can go!!!(just jump into the void) ", (int) toScreenX(-9000.0D), (int) toScreenY(10450.0D));
+        g.drawString("This is the arrow", (int) toScreenX(-9404.0D), (int) toScreenY(10400.0D));
+        g.drawString("It doubles your speed", (int) toScreenX(-9404.0D), (int) toScreenY(10450.0D));
+        g.drawString("So you can jump longer", (int) toScreenX(-9100.0D), (int) toScreenY(10450.0D));
+        g.drawString("Jump", (int) toScreenX(-8854.0D), (int) toScreenY(10560.0D));
+        g.drawString("Jump", (int) toScreenX(-7970.0D), (int) toScreenY(10535.0D));
+        g.drawString("You're on the edge of the platform", (int) toScreenX(-7650.0D), (int) toScreenY(10400.0D));
+        g.drawString("You can push off it as a barrier ", (int) toScreenX(-7650.0D), (int) toScreenY(10450.0D));
         g.setColor(new Color(46, 26, 115));
-        drawCenteredString(g, endMessage, new java.awt.Rectangle(frame.getWidth(), frame.getHeight()), new Font("bruh", Font.BOLD, 100));
+        drawCenteredString(g, endMessage, new java.awt.Rectangle(frame.getWidth(), frame.getHeight()), new Font("bruh", Font.BOLD, 50));
 
     }
 
@@ -571,17 +687,11 @@ public class Main {
         g.drawString(text, x, y);
     }
 
+
     public void updateImages() {
+        this.PLAYER = emptyPlayer.getImage();
         if (playerSkin == 1) {
             this.PLAYER = PLAYER2.getImage();
-        } else if (playerSkin == 3) {
-            this.PLAYER = PLAYER3.getImage();
-        } else if (playerSkin == 4) {
-            this.PLAYER = PLAYER4.getImage();
-        } else if (playerSkin == 5) {
-            this.PLAYER = PLAYER5.getImage();
-        } else if (playerSkin == 6) {
-            this.PLAYER = PLAYER6.getImage();
         }
         if (backgrNum == 1) {
             this.fon = fon1.getImage();
@@ -595,8 +705,22 @@ public class Main {
         } else if (backgrNum == 4) {
             this.fon = fon4.getImage();
             this.platform = pl4.getImage();
+        } else if (backgrNum == 5) {
+            ImageIcon sunset2 = new ImageIcon("src/resources/Images/закат 2.jpg");
+            this.fon = sunset2.getImage();
+            this.platform = new ImageIcon("src/resources/Images/Platform 7.png").getImage();
         }
-
+        if (Textures3d) {
+            pl1 = new ImageIcon("src/resources/Images/Platform52.png");
+            pl2 = new ImageIcon("src/resources/Images/Platform62.png");
+            pl3 = new ImageIcon("src/resources/Images/Platform 32.png");
+            pl4 = new ImageIcon("src/resources/Images/Platform 82.png");
+        } else {
+            pl1 = new ImageIcon("src/resources/Images/Platform5.png");
+            pl2 = new ImageIcon("src/resources/Images/Platform 6.png");
+            pl3 = new ImageIcon("src/resources/Images/Platform 3.png");
+            pl4 = new ImageIcon("src/resources/Images/Platform 8.png");
+        }
         if (frameCounter >= 0 && frameCounter <= 6) {
             Birdd = birdLeft1.getImage();
         } else if (frameCounter > 6 && frameCounter <= 12) {
@@ -622,38 +746,33 @@ public class Main {
 
     public void loadImages() {
         if (Textures3d) {
-            pl1 = createIcon("Images/Platform52.png");
-            pl2 = createIcon("Images/Platform62.png");
-            pl3 = createIcon("Images/Platform 32.png");
-            pl4 = createIcon("Images/Platform 82.png");
-        }else{
-            pl1 = createIcon("Images/Platform5.png");
-            pl2 = createIcon("Images/Platform 6.png");
-            pl3 = createIcon("Images/Platform 3.png");
-            pl4 = createIcon("Images/Platform 8.png");
+            pl1 = new ImageIcon("src/resources/Images/Platform52.png");
+            pl2 = new ImageIcon("src/resources/Images/Platform62.png");
+            pl3 = new ImageIcon("src/resources/Images/Platform 32.png");
+            pl4 = new ImageIcon("src/resources/Images/Platform 82.png");
+        } else {
+            pl1 = new ImageIcon("src/resources/Images/Platform5.png");
+            pl2 = new ImageIcon("src/resources/Images/Platform 6.png");
+            pl3 = new ImageIcon("src/resources/Images/Platform 3.png");
+            pl4 = new ImageIcon("src/resources/Images/Platform 8.png");
         }
-        fon1 = createIcon("Images/рассвет.png");
-        fon2 = createIcon("Images/день.jpg");
-        fon3 = createIcon("Images/фон3.jpg");
-        fon4 = createIcon("Images/ночь.png");
-        birdLeft1 = createIcon("Images/bird left 1.png");
-        birdLeft2 = createIcon("Images/bird left 2.png");
-        birdLeft3 = createIcon("Images/bird left 3.png");
-        birdLeft4 = createIcon("Images/bird left 4.png");
-        birdLeft5 = createIcon("Images/bird left 5.png");
-        birdLeft6 = createIcon("Images/bird left 6.png");
-        birdLeft7 = createIcon("Images/bird left 7.png");
-        birdLeft8 = createIcon("Images/bird left 8.png");
-        birdLeft9 = createIcon("Images/bird left 9.png");
-        birdLeft10 = createIcon("Images/bird left 10.png");
-        ImageIcon ar = createIcon("Images/Arrow.png");
-        PLAYER2 = createIcon("Images/Player2.png");
-        PLAYER3 = createIcon("Images/Player eyes right up.png");
-        PLAYER4 = createIcon("Images/Player eyes right down.png");
-        PLAYER5 = createIcon("Images/Player eyes left up.png");
-        PLAYER6 = createIcon("Images/Player eyes left down.png");
-
-        ImageIcon platform2 = createIcon("Images/Platform 2.png");
+        fon1 = new ImageIcon("src/resources/Images/рассвет.png");
+        fon2 = new ImageIcon("src/resources/Images/день.jpg");
+        fon3 = new ImageIcon("src/resources/Images/закат.jpg");
+        fon4 = new ImageIcon("src/resources/Images/ночь.png");
+        birdLeft1 = new ImageIcon("src/resources/Images/bird left 1.png");
+        birdLeft2 = new ImageIcon("src/resources/Images/bird left 2.png");
+        birdLeft3 = new ImageIcon("src/resources/Images/bird left 3.png");
+        birdLeft4 = new ImageIcon("src/resources/Images/bird left 4.png");
+        birdLeft5 = new ImageIcon("src/resources/Images/bird left 5.png");
+        birdLeft6 = new ImageIcon("src/resources/Images/bird left 6.png");
+        birdLeft7 = new ImageIcon("src/resources/Images/bird left 7.png");
+        birdLeft8 = new ImageIcon("src/resources/Images/bird left 8.png");
+        birdLeft9 = new ImageIcon("src/resources/Images/bird left 9.png");
+        birdLeft10 = new ImageIcon("src/resources/Images/bird left 10.png");
+        ImageIcon ar = new ImageIcon("src/resources/Images/Arrow.png");
+        eye = new ImageIcon("src/resources/Images/eye.png");
+        emptyPlayer = new ImageIcon("src/resources/Images/player.png");
         this.arrow = ar.getImage();
     }
 
@@ -662,15 +781,16 @@ public class Main {
         public void run() {
             Scanner s = null;
             try {
-                s = new Scanner(new File("src/levels/name.txt"));
+                s = new Scanner(new File("src/resources/levels/name.txt"));
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
             Audio track = null;
-            if (s.nextLine().equals("learn")) {
+            assert s != null;
+            if (s.nextLine().equals("learn") && restore) {
                 track = new Audio("practice mode", 1.0, 85000);
             } else {
-                double a = Math.random();
+                double a = Math.random() * 0.7;
                 if (a <= 0.1) {
                     track = new Audio("AirborneRobots", 1.0, 85000);
                 } else if (a > 0.1 && a <= 0.2) {
@@ -684,13 +804,7 @@ public class Main {
                 } else if (a > 0.5 && a <= 0.6) {
                     track = new Audio("Deadlocked", 1.0, 85000);
                 } else if (a > 0.6 && a <= 0.7) {
-                    track = new Audio("ElectromanAdventures", 1.0, 85000);
-                } else if (a > 0.7 && a <= 0.8) {
                     track = new Audio("The7Seas", 1.0, 85000);
-                } else if (a > 0.8 && a <= 0.9) {
-                    track = new Audio("Stronger", 1.0, 85000);
-                } else if (a > 0.9 && a <= 1) {
-                    track = new Audio("GeometricalDominator", 1.0, 85000);
                 }
             }
             assert track != null;
@@ -698,8 +812,9 @@ public class Main {
             track.setVolume();
             track.play();
 
-            while (true)
+            while (true) {
                 track.repeat();
+            }
         }
     }
 
@@ -712,11 +827,11 @@ public class Main {
         public ComboBoxFrame() {
             setTitle("level selection");
             setSize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
-            levels = new JComboBox<String>();
+            levels = new JComboBox<>();
             levels.setEditable(false);
             Scanner s = null;
             try {
-                s = new Scanner(new File("src/levels/levels.txt"));
+                s = new Scanner(new File("src/resources/levels/levels.txt"));
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
@@ -730,11 +845,12 @@ public class Main {
                     if (name.equals("new lvl")) {
                         level = Generator.generateLevel(-1);
                         restore = false;
-                        clearFile("src/levels/restore.txt");
-                        appendStrToFile("src/levels/restore.txt", "false");
-                    } else
+                        clearFile("src/resources/levels/restore.txt");
+                        appendStrToFile("src/resources/levels/restore.txt", "false");
+                    } else {
                         level = restoreLevel(name);
-                    System.out.println("restore mode on");
+                    }
+                    System.out.println("Restart to restore");
                     System.exit(10);
                 }
             });
@@ -743,4 +859,5 @@ public class Main {
             add(comboPanel, BorderLayout.CENTER);
         }
     }
+
 }

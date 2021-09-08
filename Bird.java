@@ -8,7 +8,7 @@ public class Bird {
         this.skin = 1;
     }
 
-    public static void move(Bird[] birds){
+    public static void move(Bird[] birds) {
         for (int i = 0; i < birds.length; i++) {
             Bird cur = birds[i];
             cur.x -= 7 + Player.speed;

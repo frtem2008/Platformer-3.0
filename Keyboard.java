@@ -4,8 +4,10 @@ import java.awt.event.KeyListener;
 public class Keyboard implements KeyListener {
     private static final boolean[] keys = new boolean[66568];
     private static boolean left;
+    private static boolean tab;
     private static boolean right;
     private static boolean up;
+    private static boolean space;
     private static boolean shift;
     private static boolean f11;
     private static boolean s;
@@ -19,12 +21,10 @@ public class Keyboard implements KeyListener {
     private static boolean x;
     private static boolean z;
     private static boolean b;
-    private static boolean ctrl;
-    private static boolean m;
     private static boolean n;
-    private static boolean del;
-    private static boolean tab;
+    private static boolean m;
     private static boolean u;
+    private static boolean ctrl;
 
     public Keyboard() {
     }
@@ -33,25 +33,38 @@ public class Keyboard implements KeyListener {
         return b;
     }
 
-    public boolean getDel() {
-        return del;
+    public boolean getN() {
+        return n;
     }
+
+    public boolean getM() {
+        return m;
+    }
+
+    public boolean getU() {
+        return u;
+    }
+
+    public boolean getCtrl() {
+        return ctrl;
+    }
+
     public boolean getTab() {
         return tab;
     }
-    public boolean getU(){
-        return u;
-    }
+
     public void update() {
-        u = keys[KeyEvent.VK_U];
         tab = keys[KeyEvent.VK_TAB];
-        del = keys[KeyEvent.VK_DELETE];
-        b = keys[KeyEvent.VK_B];
-        z = keys[KeyEvent.VK_Z];
+        n = keys[KeyEvent.VK_N];
+        m = keys[KeyEvent.VK_M];
+        u = keys[KeyEvent.VK_U];
+        ctrl = keys[KeyEvent.VK_CONTROL];
+        b = keys[66];
+        z = keys[90];
         left = keys[37] || keys[65];
         right = keys[39] || keys[68];
         up = keys[38] || keys[87] || keys[32];
-        boolean space = keys[32];
+        space = keys[32];
         shift = keys[16];
         f11 = keys[122];
         s = keys[83];
@@ -63,21 +76,6 @@ public class Keyboard implements KeyListener {
         v = keys[86];
         g = keys[71];
         x = keys[88] || keys[127];
-        ctrl = keys[KeyEvent.VK_CONTROL];
-        m = keys[KeyEvent.VK_M];
-        n = keys[KeyEvent.VK_N];
-    }
-
-    public boolean getCtrl() {
-        return ctrl;
-    }
-
-    public boolean getM() {
-        return m;
-    }
-
-    public boolean getN() {
-        return n;
     }
 
     public boolean getZ() {

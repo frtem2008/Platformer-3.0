@@ -229,18 +229,17 @@ public class Generator {
             y2 = y1 + ((int) (Math.random() * 300) + 400);
             XSpeed = Math.random() * 2.5 + 2.5;
             YSpeed = ((y2 - y1) * XSpeed) / (x2 - x1);
-            pl = new MovingPlatform(a, x1, x2, XSpeed, true, y1,y2, YSpeed, true);
+            pl = new MovingPlatform(a, x1, x2, XSpeed, true, y1, y2, YSpeed, true);
             to = new Platform(pl.x2 + (int) pl.platform.getWidth() + 100, pl.y2, (int) (Math.random() * 300) + 100, 50, true);
         } else {
             y2 = y1 - ((int) (Math.random() * 300) + 200);
             XSpeed = Math.random() * 2.5 + 2.5;
             YSpeed = ((y2 - y1) * XSpeed) / (x2 - x1);
-            pl = new MovingPlatform(a, x1, x2, XSpeed, true, y2,y1, YSpeed, true);
+            pl = new MovingPlatform(a, x1, x2, XSpeed, true, y2, y1, YSpeed, true);
             to = new Platform(pl.x2 + (int) pl.platform.getWidth() + 100, pl.y1, (int) (Math.random() * 300) + 100, 50, true);
         }
         lvlPart[0] = pl;
         lvlPart[1] = to;
-        System.out.println("mov plat gen at " + pl.x1 + "    " + pl.y1);
         return lvlPart;
     }
 

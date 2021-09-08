@@ -12,10 +12,10 @@ public class Display extends JFrame {
     }
 
     public static void main(String[] args) throws InterruptedException {
-
+        Downloader.fileCheck();
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         Display.frame.setExtendedState(6);
-        ImageIcon img = createIcon("Images/Icon.png");
+        ImageIcon img = createIcon("resources/Images/Icon.png");
         frame.setIconImage(img.getImage());
         frame.setUndecorated(true);
         frame.setVisible(true);

@@ -12,7 +12,7 @@ public class FallingPlatform {
         t.schedule(new TimerTask() {
             @Override
             public void run() {
-                MovingPlatform pl = new MovingPlatform(platform, (int)platform.getPlatformX(), (int)platform.getPlatformX(), 0, true, (int)platform.getPlatformY(), (int)platform.getPlatformY() + 5000, 5, true);
+                MovingPlatform pl = new MovingPlatform(platform, (int) platform.getPlatformX(), (int) platform.getPlatformX(), 0, true, (int) platform.getPlatformY(), (int) platform.getPlatformY() + 5000, 5, true);
             }
         }, fallingTime);
     }
